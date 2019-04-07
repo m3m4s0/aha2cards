@@ -6,3 +6,4 @@ This tool helps you to export your AHA.IO Features or Ideas in a printable forma
 ## Next steps
 * include export files
 * direct connection to AHA.IO API to pull information
+* generate pdf cards

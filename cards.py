@@ -1,6 +1,6 @@
 import pandas as pd
 import jinja2
-import pdfkit
+import pdfkit #not used yet
 
 
 def read_dataset():
@@ -26,4 +26,5 @@ def write_to_html(outputText):
     html_file.close()
     
 
-read_dataset()
+if __name__ == "__main__":
+    read_dataset()
