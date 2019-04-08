@@ -1,6 +1,30 @@
 import pandas as pd
 import jinja2
-import pdfkit #not used yet
+# import pdfkit #not used yet
+import requests 
+import tqdm
+import configparser
+
+def get_from_api(company, api_key, product):
+    api_url = f'https://{company}.aha.io/api/v1/products/{product}/features'
+    response = requests.get(f'{api_url}', headers={'Authorization': f'Bearer {api_key}'})
+    pages = response.json()['pagination']['total_pages']
+    features = response.json()['features']
+    for page in tqdm.tqdm(range(2,pages+1)):
+        response = requests.get(f'{api_url}?page={page}', headers={'Authorization': f'Bearer {api_key}'})
+        features.extend(response.json()['features'])
+    
+    f_list = []
+    for f_id in tqdm.tqdm(features):
+        response = requests.get(f'{api_url}/{f_id["id"]}', headers={'Authorization': f'Bearer {api_key}'})      
+        feature = response.json()['feature']
+        if feature['workflow_status']['name'].upper() not in ['SHIPPED', 'DECLINED','IMPLEMENTED','RESOLVED']: # this is ugly since the API doesn't allow query against the status
+            f_list.append(feature)  
+    
+    template_vars = {'cards' : f_list}
+    outtext = prepare_template(template_vars, 'cards_api')   
+    write_to_html(outtext, 'cards_api')     
+
 
 
 def read_dataset():
@@ -9,7 +33,9 @@ def read_dataset():
     cards = df.append(dfi, sort=False)
     cards['Feature_description'] = cards['Feature_description'].str.slice(0,180) + '...' 
     template_vars = {'cards' : cards}
-    prepare_template(template_vars, 'cards')
+    outtext = prepare_template(template_vars, 'cards')
+    write_to_html(outtext, 'cards')
+
 
 def prepare_template(template_vars, template):
     templateLoader = jinja2.FileSystemLoader(searchpath="./template")
@@ -17,14 +43,21 @@ def prepare_template(template_vars, template):
     TEMPLATE_FILE = template+".html"
     template = templateEnv.get_template(TEMPLATE_FILE)
     outputText = template.render(template_vars)
-    write_to_html(outputText)
+    return outputText
 
 
-def write_to_html(outputText):    
-    html_file = open('reports/cards.html', 'w', encoding='utf-8')
+def write_to_html(outputText, fileName):    
+    html_file = open(f'reports/{fileName}.html', 'w', encoding='utf-8')
     html_file.write(outputText)
     html_file.close()
-    
+
 
 if __name__ == "__main__":
-    read_dataset()
+    # read_dataset()
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    company = config['AHA.IO']['COMPANY']
+    api_key = config['AHA.IO']['API_KEY']
+    product = config['AHA.IO']['PRODUCT']
+    get_from_api(company,api_key, product)
+
