@@ -98,9 +98,6 @@
                         <p><b>{{ value['name'] }}</b></p>
                         {{ value['description']['body'] |  truncate(180,false,'...') | striptags  | e }} 
                     </div>
-                    <div class="panel-footer">
-                        <p></p>
-                    </div>
                 </div>
             </div>
             {% endfor %}

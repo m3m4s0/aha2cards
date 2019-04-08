@@ -97,11 +97,7 @@
                         <p><b>{{ value[1]['Feature_name'] }}</b></p>
                         <p class="text-justify"><small>{{ value[1]['Feature_description']}}</small></p>
                     </div>
-                    <div class="panel-footer">
-                        (<span>{{ value[1]['req_count'] | int}}</span>)
-                         <span>{{ value[1]['Release'] }} </span>
-                        <div class="pull-right"> {{ value[1]['prod_name'] | upper}}</div>
-                    </div>
+
                 </div>
             </div>
             {% endfor %}
