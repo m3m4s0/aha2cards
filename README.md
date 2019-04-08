@@ -5,10 +5,15 @@ This tool helps you to export your AHA.IO Features or Ideas in a printable forma
 
 ## Query with API
 To Query the AHA.IO API you need to create a config.ini file that looks like this
+
 [AHA.IO]
+
 COMPANY = 
+
 API_KEY = 
+
 PRODUCT = 
+
 
 
 
